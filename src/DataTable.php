@@ -104,7 +104,7 @@ abstract class DataTable extends Decorator {
         $name = $this->name;
         $columns = $this->columns;
         $columnNames = $this->columnNames;
-        return view('DataTables::script', compact('url', 'name', 'columns', 'columnNames','limits','afterDrawCallback', 'noSorting', 'initSortString'));
+        return view('DataTable::script', compact('url', 'name', 'columns', 'columnNames','limits','afterDrawCallback', 'noSorting', 'initSortString'));
 
     }
 
@@ -158,13 +158,11 @@ abstract class DataTable extends Decorator {
      */
     public function renderData($request) {
 
-        //dd($request->only(['draw','columns','order','start','length','search']));
-
         $draw = (int) $request->get('draw');
         $columns = $request->get('columns');
         $order = $request->get('order');
         $start = $request->get('start');
-        $length = $request->get('length') == '-1'? '1000' : $request->get('length') ;
+        $length = $request->get('length') == '-1' ? '1000' : $request->get('length') ;
         $search = $request->get('search');
 
         $orderDir = $order[0]['dir'];
@@ -184,18 +182,10 @@ abstract class DataTable extends Decorator {
 
         $data = ["draw" => $draw,
         "recordsTotal" => $total,
-        "recordsFiltered" => $total,
+        "recordsFiltered" => count($data),
         "data" => $data ];
 
         return $data;
-    }
-
-    /**
-     * Skrypty wywoływane po wypełnieniu tabeli danymi. Niektóre dekoratory mogą wymagać ponownego wykonania skryptu.
-     * @return string
-     */
-    protected function afterDrawCallback() {
-        return "";
     }
 
 }
