@@ -76,7 +76,7 @@ abstract class DataTable extends Decorator {
         $this->columnsCollection = new Collection();
 
         foreach($this->columns as $column => $attributes) {
-            $attributes = is_array($attributes) ? $attributes : ['name' => $attributes];
+            $attributes = is_array($attributes) ? $attributes : ['title' => $attributes];
             $this->columnsCollection->put($column, new Column($column, $attributes, $this->html));
         }
     }
@@ -120,27 +120,16 @@ abstract class DataTable extends Decorator {
         $initSortString = "";
         foreach($this->columnsCollection as $column) {
             if (isset($column->sort)) {
-                //$initSortColumn = $column->getId();
                 $initSortDirection = $column->sort;
                 $initSortColumnIndex = $colCount;
                 $initSortString .= '['.$initSortColumnIndex.', "'.$initSortDirection.'"],';
             }
             $colCount++;
         }
-
         if ($initSortString != "") {
             $initSortString = rtrim($initSortString, ',');
             $initSortString = 'order: [ ' . $initSortString . ' ],';
         }
-
-
-        /*if (is_array($this->initSort)) {
-            $initSortColumn = $this->initSort[0];
-            $initSortDirection = $this->initSort[1];
-            $initSortColumnIndex = array_search($initSortColumn, $this->columns);
-
-            $initSortString = 'order: ['.$initSortColumnIndex.', "'.$initSortDirection.'"],';
-        }*/
 
         $url = $this->url;
         $name = $this->name;
@@ -213,8 +202,6 @@ abstract class DataTable extends Decorator {
 
         $orderDir = $order[0]['dir'];
         $orderCol = array_keys($this->columns)[$order[0]['column']];
-        //array_search($order[0]['column'], );
-
         $search = $search['value'];
 
         $data = $this->getData($start, $length, $search, $orderCol, $orderDir);
