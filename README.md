@@ -10,8 +10,19 @@ Simple DataTable integration
 
 Via Composer
 
-``` bash
-composer require code4interactive/DataTable
+``` json
+//composer.json
+"repositories": [
+    {
+        "type": "vcs",
+        "url": "https://github.com/code4interactive/DataTable"
+    }
+],
+"require": {
+    "code4interactive/DataTable": "*"
+}
+
+composer install / update
 ```
 
 ## Service provider
