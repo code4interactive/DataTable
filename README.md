@@ -29,15 +29,80 @@ Code4\DataTable\DataTableServiceProvider
 
 ## Usage
 
+Make class which implements DataTable abstract class:
 
 ``` php
 
+use Code4\DataTable\DataTable;
 
+class MyDataTableClass extends DataTable {
+
+    protected $name = "MyDataTable";
+
+    protected $columns = [
+        'id'          => 'Id',
+        'name'        => ['title' => 'Name', 'sort' => 'asc'],
+        'type'        => ['title' => 'Typ'],
+        'short_name'  => ['title' => 'Skrócona nazwa'],
+        'description' => ['title' => 'Opis', 'defaultContent' => '...'],
+        'actions'     => ['title' => 'Akcje', 'orderable' => false, 'searchable' => false, 'width' => '100px']
+    ];
+
+    protected $cellDecorators = [
+        'actions' => ['buttons'],
+        'type'    => ['type']
+    ];
+
+    protected $url = '/url/to/data/source';
+
+    protected function beforeRender() {
+        $this->column('id')->addCheckbox();
+    }
+
+    protected function getData($start, $length, $search, $orderCol, $orderDir) {
+        $company = new Models\CompanyAssets();
+        return $company->getDataForDataTable($start, $length, $search, $orderCol, $orderDir);
+    }
+
+    protected function countAll() {
+        return Models\CompanyAssets::count();
+    }
+
+    protected function typeDecorator($cell, $row) {
+        return '<strong>'.$cell.'</strong>';
+    }
+
+    protected function buttonsDecorator($cell, $row)
+    {
+        return '<div class="pull-right">' .
+        '<a href="/erp/assets/' . $row['id'] . '/generateBadge" class="btn btn-xs btn-info generateQr loadInModal" data-modalId="qrBadge"><i class="fa fa-qrcode"></i></a>&nbsp;' .
+        '<a href="/erp/assets/' . $row['id'] . '/edit" class="btn btn-xs btn-info editModal" data-modalId="editAsset"><i class="fa fa-pencil"></i></a>&nbsp;' .
+        '<a href="/erp/assets/' . $row['id'] . '/delete" class="btn btn-xs btn-danger confirmDelete" data-name="' . $row['name'] . '"><i class="fa fa-trash"></i></a>' .
+        '</div>';
+    }
+
+    protected function afterDrawCallBack() {
+
+    }
+}
 
 ```
 
+Make instance of created class and pass object to view to render table and scripts
+``` php
+//Controller
+$dt = DataTable::make(MyDataTableClass::class);
+return view('myview', compact('dt'));
 
+//View
+{!! $dt->renderTable() !!}
+{!! $dt->renderScript() !!}
 
+//Controller method for rendering data
+public function renderData(Request $request) {
+    return DataTable::make(CADataTable::class)->renderData($request);
+}
+```
 
 
 
