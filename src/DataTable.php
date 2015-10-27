@@ -177,8 +177,9 @@ abstract class DataTable extends Decorator {
 
     /**
      * Funkcja pozwala na wykonanie dodatkowych operacji na obiekcie zanim zostanie on wyrenderowany
+     * @return null
      */
-    abstract protected function beforeRender();
+    public function beforeRender() {}
 
     /**
      * Renderuje dane uwzględniając sortowanie, wyszukiwanie, paginację oraz
