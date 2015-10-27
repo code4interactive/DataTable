@@ -4,6 +4,7 @@
         $('#dt-{{$name}}').dataTable({
             responsive: true,
             serverSide: true,
+            //deferRender: true,  //speedup rendering
             dom: 'T<"clear">lfrtip',
             autoWidth: false,
             {!!$initSortString!!}
@@ -14,10 +15,10 @@
             },
             lengthMenu: {!!$limits!!},
             columns: [
-                @foreach($columns as $col)
+                @foreach($columns as $column)
                 {
-                    data: '{{$col}}',
-                    orderable: {!!  in_array($col, $noSorting) ? 'false' : 'true' !!}
+                    data: '{{$column->getId()}}',
+                    orderable: {!!  $column->isSortable() ? 'false' : 'true' !!}
                 },
                 @endforeach
                 ]

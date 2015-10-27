@@ -2,8 +2,8 @@
     <table id="dt-{{$name}}" class="table table-striped table-bordered table-hover" >
         <thead>
         <tr>
-        @foreach($columnNames as $columnName)
-            <th>{{$columnName}}</th>
+        @foreach($columns as $col)
+            <th>{{$col->title}}</th>
         @endforeach
         </tr>
         </thead>
@@ -11,8 +11,8 @@
         </tbody>
         <tfoot>
         <tr>
-        @foreach($columnNames as $columnName)
-            <th>{{$columnName}}</th>
+        @foreach($columns as $col)
+            <th>{{$col->title}}</th>
         @endforeach
         </tr>
         </tfoot>

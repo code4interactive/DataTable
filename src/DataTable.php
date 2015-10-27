@@ -2,8 +2,10 @@
 
 namespace Code4\DataTable;
 
+use Collective\Html\HtmlBuilder;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 abstract class DataTable extends Decorator {
 
@@ -26,6 +28,11 @@ abstract class DataTable extends Decorator {
     protected $columns;
 
     /**
+     * Lista instancji klasy Columns
+     */
+    protected $columnsCollection;
+
+    /**
      * Lista nazw kolumn do wyświetlenia na stronie
      * @var
      */
@@ -44,6 +51,11 @@ abstract class DataTable extends Decorator {
     protected $initSort;
 
     /**
+     *  @var HtmlBuilder
+     */
+    protected $html;
+
+    /**
      * Przyjmuje tablice asocjacyjną lub zwykła. W asocjacyjnej wartość reprezentuje opis zakresu
      * Maksymalna wartość przy -1 to 10000 wierszy danych
      * @var array
@@ -55,22 +67,36 @@ abstract class DataTable extends Decorator {
         -1 => "Max"
     ];
 
-    public function __construct() {
-        if ($this->name == "") die('Brak parametru $name w DataTable');
-        if ($this->url == "") die('Brak parametru $url w DataTable');
-        if (!is_array($this->columns)) die('Brak listy kolumn w DataTable');
+    public function __construct(HtmlBuilder $html) {
+        if ($this->name == "") throw new \Exception('Attribute $name is missing');
+        if ($this->url == "") throw new \Exception('Attribute protected $url is missing');
+        if (!is_array($this->columns)) throw new \Exception('Attribute (array) protected $columns is missing or wrong type');
+
+        $this->html = $html;
+        $this->columnsCollection = new Collection();
+
+        foreach($this->columns as $column => $attributes) {
+            $attributes = is_array($attributes) ? $attributes : ['name' => $attributes];
+            $this->columnsCollection->put($column, new Column($column, $attributes, $this->html));
+        }
     }
+
+    /**
+     * Zwraca do edycji wybraną kolumnę
+     * @param $name
+     * @return mixed
+     */
+    public function column($name) {
+        return $this->columnsCollection->get($name);
+    }
+
 
     /**
      * Renderuje html tabeli
      * @return \Illuminate\View\View
      */
     public function renderTable() {
-        //$data = $this->data;
-        $name = $this->name;
-        $columns = $this->columns;
-        $columnNames = $this->columnNames;
-        return view('plugins.datatable.table', compact('name', 'columns', 'columnNames'));
+        return view('DataTable::table', ['name' => $this->name, 'columns' => $this->columnsCollection]);
     }
 
     /**
@@ -89,25 +115,38 @@ abstract class DataTable extends Decorator {
 
         $afterDrawCallback = $this->afterDrawCallback();
 
-        $noSorting = $this->noSorting;
-
+        /** Generacja stringu początkowego sortowania **/
+        $colCount = 0;
         $initSortString = "";
-        if (is_array($this->initSort)) {
+        foreach($this->columnsCollection as $column) {
+            if (isset($column->sort)) {
+                //$initSortColumn = $column->getId();
+                $initSortDirection = $column->sort;
+                $initSortColumnIndex = $colCount;
+                $initSortString .= '['.$initSortColumnIndex.', "'.$initSortDirection.'"],';
+            }
+            $colCount++;
+        }
+
+        if ($initSortString != "") {
+            $initSortString = rtrim($initSortString, ',');
+            $initSortString = 'order: [ ' . $initSortString . ' ],';
+        }
+
+
+        /*if (is_array($this->initSort)) {
             $initSortColumn = $this->initSort[0];
             $initSortDirection = $this->initSort[1];
             $initSortColumnIndex = array_search($initSortColumn, $this->columns);
 
             $initSortString = 'order: ['.$initSortColumnIndex.', "'.$initSortDirection.'"],';
-        }
+        }*/
 
         $url = $this->url;
         $name = $this->name;
-        $columns = $this->columns;
-        $columnNames = $this->columnNames;
-        return view('DataTable::script', compact('url', 'name', 'columns', 'columnNames','limits','afterDrawCallback', 'noSorting', 'initSortString'));
-
+        $columns = $this->columnsCollection;
+        return view('DataTable::script', compact('url', 'name', 'columns','limits','afterDrawCallback', 'initSortString'));
     }
-
 
     /**
      * Zamienia array na string umieszczając teksty w cudzysłowach.
@@ -152,11 +191,18 @@ abstract class DataTable extends Decorator {
     abstract protected function countAll();
 
     /**
+     * Funkcja pozwala na wykonanie dodatkowych operacji na obiekcie zanim zostanie on wyrenderowany
+     */
+    abstract protected function beforeRender();
+
+    /**
      * Renderuje dane uwzględniając sortowanie, wyszukiwanie, paginację oraz
      * @param Request $request
      * @return array
      */
     public function renderData($request) {
+
+        $this->beforeRender();
 
         $draw = (int) $request->get('draw');
         $columns = $request->get('columns');
@@ -166,7 +212,8 @@ abstract class DataTable extends Decorator {
         $search = $request->get('search');
 
         $orderDir = $order[0]['dir'];
-        $orderCol = $this->columns[$order[0]['column']];
+        $orderCol = array_keys($this->columns)[$order[0]['column']];
+        //array_search($order[0]['column'], );
 
         $search = $search['value'];
 
@@ -175,6 +222,8 @@ abstract class DataTable extends Decorator {
         if ($data instanceof Arrayable) {
             $data = $data->toArray();
         }
+
+        $data = $this->parseColumns($data);
 
         $data = $this->decorate($data);
 
@@ -187,5 +236,38 @@ abstract class DataTable extends Decorator {
 
         return $data;
     }
+
+    /**
+     * Przetwarza kolumny dodając brakujące oraz modyfikując ich zawartość
+     * @param $data
+     * @return array
+     */
+    public function parseColumns($data) {
+        $outData = [];
+        foreach($data as $row) {
+
+            $row = $this->fixMissingCols($row);
+
+            foreach($this->columns as $column => $attr) {
+
+                $columnObject = $this->columnsCollection->get($column);
+
+                //Default jeżeli pole jest puste
+                if (isset($columnObject->defaultContent) && ($row[$column] == '' || $row[$column] == null)) {
+                    $row[$column] = $columnObject->defaultContent;
+                }
+
+                //Overwrite jeżeli jest ustawiony
+                if (isset($columnObject->content)) {
+                    $row[$column] = $columnObject->content;
+                }
+            }
+            $outData[] = $row;
+        }
+
+        return $outData;
+    }
+
+    abstract protected function afterDrawCallBack();
 
 }

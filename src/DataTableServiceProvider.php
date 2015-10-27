@@ -12,7 +12,8 @@ class DataTableServiceProvider extends ServiceProvider {
         $this->app['datatable'] = $this->app->share(
             function ($app) {
                 //$request = $app->make('yajra\Datatables\Request');
-                //return new Datatables($request);
+                $html = $app->make('Collective\Html\HtmlBuilder');
+                return new DataTableFactory($html);
             }
         );
 

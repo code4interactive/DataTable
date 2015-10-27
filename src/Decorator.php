@@ -15,7 +15,7 @@ abstract class Decorator {
      * @param $data
      * @return array
      */
-    protected function decorate($data) {
+    public function decorate($data) {
 
         $result = [];
 
@@ -23,12 +23,14 @@ abstract class Decorator {
             $newRow = [];
 
             //Sprawdzamy czy nie brakuje kolumny
-            $row = $this->checkForMissingCols($row);
+            $row = $this->fixMissingCols($row);
+
+            //Dekorujemy wiersz
             $row = $this->decorateRow($row);
 
+            //Dekorujemy komórki
             foreach($row as $cellName=>$cell) {
-                $cell = $this->decorateCell($cellName, $cell, $row);
-                $newRow[$cellName] = $cell;
+                $newRow[$cellName] = $this->decorateCell($cellName, $cell, $row);
             }
 
             $result[] = $newRow;
@@ -42,8 +44,8 @@ abstract class Decorator {
      * @param array $row
      * @return array
      */
-    private function checkForMissingCols($row) {
-        foreach($this->columns as $column) {
+    protected function fixMissingCols($row) {
+        foreach($this->columns as $column=>$attribs) {
             if (!array_key_exists($column, $row)) {
                 $row[$column] = null;
             }
@@ -56,18 +58,12 @@ abstract class Decorator {
      * @param $row
      * @return mixed
      */
-    private function decorateRow($row) {
-
+    public function decorateRow($row) {
         foreach($this->rowDecorators as $decoratorName) {
-
             if (method_exists($this, $decoratorName.'Decorator')) {
-
                 $row = call_user_func( array($this, $decoratorName.'Decorator'), $row );
-
             }
-
         }
-
         return $row;
     }
 
@@ -78,22 +74,14 @@ abstract class Decorator {
      * @param $row
      * @return mixed
      */
-    private function decorateCell($cellName, $cell, $row) {
-
+    public function decorateCell($cellName, $cell, $row) {
         if (array_key_exists($cellName, $this->cellDecorators)) {
-
             foreach($this->cellDecorators[$cellName] as $decoratorName) {
-
                 if (method_exists($this, $decoratorName.'Decorator')) {
-
                     $cell = call_user_func( array($this, $decoratorName.'Decorator'), $cell, $row );
-
                 }
-
             }
-
         }
-
         return $cell;
     }
 }
