@@ -18,7 +18,8 @@
                 @foreach($columns as $column)
                 {
                     data: '{{$column->getId()}}',
-                    orderable: {!!  $column->isSortable() ? 'false' : 'true' !!}
+                    {!! $column->getWidthString() !!}
+                    orderable: {!!  $column->isSortable() ? 'true' : 'false' !!}
                 },
                 @endforeach
                 ]

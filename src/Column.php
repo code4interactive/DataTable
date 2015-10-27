@@ -45,7 +45,18 @@ class Column extends Fluent {
      * @return bool
      */
     public function isSortable() {
-        return isset($this->orderable) && $this->orderable ? true : false;
+        return isset($this->orderable) && $this->orderable === true ? true : false;
+    }
+
+    /**
+     * Zwraca string dla script blade
+     * @return string
+     */
+    public function getWidthString() {
+        if (isset($this->width)) {
+            return "width: '".$this->width."', ";
+        }
+        return '';
     }
 
 }
