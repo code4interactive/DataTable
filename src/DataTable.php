@@ -144,19 +144,15 @@ abstract class DataTable extends Decorator {
      */
     public function collapseToString($arr) {
         $string = '';
-
-        for ($lp=0; $lp<count($arr); $lp++) {
-
+        $arrayCount = count($arr);
+        for ($lp=0; $lp<$arrayCount; $lp++) {
             $item = $arr[$lp];
-
             if (filter_var($item, FILTER_VALIDATE_INT) !== false) {
                 $string .= $item.',';
             } else {
                 $string .= '"'.$item.'",';
             }
-
         }
-
         return rtrim($string, ',');
     }
 
@@ -194,7 +190,7 @@ abstract class DataTable extends Decorator {
         $this->beforeRender();
 
         $draw = (int) $request->get('draw');
-        $columns = $request->get('columns');
+        //$columns = $request->get('columns');
         $order = $request->get('order');
         $start = $request->get('start');
         $length = $request->get('length') == '-1' ? '1000' : $request->get('length') ;

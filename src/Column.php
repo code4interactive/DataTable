@@ -12,7 +12,7 @@ class Column extends Fluent {
      */
     protected $html;
 
-    function __construct($id, $attributes, HtmlBuilder $html) {
+    public function __construct($id, $attributes, HtmlBuilder $html) {
         $this->id = $id;
         $this->html = $html;
 

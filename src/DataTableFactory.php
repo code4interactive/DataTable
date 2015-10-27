@@ -17,7 +17,7 @@ class DataTableFactory {
 
     /**
      * @param $instanceClass
-     * @return \Code4\DataTable\DataTable;
+     * @return \Code4\DataTable\DataTable
      */
     public function make($instanceClass) {
 
