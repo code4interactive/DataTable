@@ -251,6 +251,12 @@ abstract class DataTable extends Decorator {
         return $outData;
     }
 
-    abstract protected function afterDrawCallBack();
+    /**
+     * Funkcja może zwracać funkcję JS do wywołania po każdym rysowniu tabeli
+     * @return string
+     */
+    public function afterDrawCallBack() {
+        return '';
+    }
 
 }
