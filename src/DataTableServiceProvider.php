@@ -5,7 +5,7 @@ namespace Code4\DataTable;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\ServiceProvider;
 
-class DataTableServiceProvider4 extends ServiceProvider {
+class DataTableServiceProvider extends ServiceProvider {
 
     public function register() {
 
