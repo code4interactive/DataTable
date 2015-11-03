@@ -95,7 +95,7 @@ abstract class DataTable extends Decorator {
      * @return \Illuminate\View\View
      */
     public function renderTable() {
-        return view('DataTable::table', ['name' => $this->name, 'columns' => $this->columnsCollection]);
+        return \View::make('DataTable::table', ['name' => $this->name, 'columns' => $this->columnsCollection]);
     }
 
     /**
@@ -104,7 +104,7 @@ abstract class DataTable extends Decorator {
      */
     public function renderScript() {
 
-        if (isAssoc($this->limits)) {
+        if ($this->isAssoc($this->limits)) {
             $keys = array_keys($this->limits);
             $values = array_values($this->limits);
             $limits = '[['.implode(',',$keys).'],['.$this->collapseToString($values).']]';
@@ -133,7 +133,7 @@ abstract class DataTable extends Decorator {
         $url = $this->url;
         $name = $this->name;
         $columns = $this->columnsCollection;
-        return view('DataTable::script', compact('url', 'name', 'columns','limits','afterDrawCallback', 'initSortString'));
+        return \View::make('DataTable::script', compact('url', 'name', 'columns','limits','afterDrawCallback', 'initSortString'));
     }
 
     /**
@@ -257,6 +257,15 @@ abstract class DataTable extends Decorator {
      */
     public function afterDrawCallBack() {
         return '';
+    }
+
+    /**
+     * Sprawdza czy tablica jest asocjacyjna czy nie
+     * @param array $arr
+     * @return bool
+     */
+    private function isAssoc($arr) {
+        return array_keys($arr) !== range(0, count($arr) - 1);
     }
 
 }
