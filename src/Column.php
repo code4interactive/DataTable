@@ -1,7 +1,6 @@
 <?php
 namespace Code4\DataTable;
 
-use Collective\Html\HtmlBuilder;
 use Illuminate\Support\Fluent;
 
 class Column extends Fluent {
@@ -12,7 +11,7 @@ class Column extends Fluent {
      */
     protected $html;
 
-    public function __construct($id, $attributes, HtmlBuilder $html) {
+    public function __construct($id, $attributes, $html) {
         $this->id = $id;
         $this->html = $html;
 

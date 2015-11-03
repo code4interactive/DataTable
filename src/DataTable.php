@@ -2,7 +2,6 @@
 
 namespace Code4\DataTable;
 
-use Collective\Html\HtmlBuilder;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -67,7 +66,7 @@ abstract class DataTable extends Decorator {
         -1 => "Max"
     ];
 
-    public function __construct(HtmlBuilder $html) {
+    public function __construct($html) {
         if ($this->name == "") throw new \Exception('Attribute $name is missing');
         if ($this->url == "") throw new \Exception('Attribute protected $url is missing');
         if (!is_array($this->columns)) throw new \Exception('Attribute (array) protected $columns is missing or wrong type');

@@ -2,7 +2,7 @@
 
 namespace Code4\DataTable;
 
-use Collective\Html\HtmlBuilder;
+//use Collective\Html\HtmlBuilder;
 
 class DataTableFactory {
 
@@ -11,7 +11,7 @@ class DataTableFactory {
      */
     protected $html;
 
-    public function __construct(HtmlBuilder $html) {
+    public function __construct($html) {
         $this->html = $html;
     }
 
