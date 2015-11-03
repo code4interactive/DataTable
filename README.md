@@ -1,7 +1,7 @@
 # DataTable - Laravel Package
 
 [![Coverage Status][ico-scrutinizer]][link-scrutinizer]
-[![Circle CI][ico-circle]](https://circleci.com/gh/code4interactive/menu/tree/master)
+[![Circle CI][ico-circle]](https://circleci.com/gh/code4interactive/DataTable/tree/L4)
 
 Simple jQuery DataTable plugin integration
 
@@ -55,7 +55,7 @@ class MyDataTableClass extends DataTable {
 
     protected $url = '/url/to/data/source';
 
-    protected function beforeRender() {
+    public function beforeRender() {
         $this->column('id')->addCheckbox();
     }
 
@@ -81,7 +81,7 @@ class MyDataTableClass extends DataTable {
         '</div>';
     }
 
-    protected function afterDrawCallBack() {
+    public function afterDrawCallBack() {
 
     }
 }
@@ -100,7 +100,7 @@ return view('myview', compact('dt'));
 
 //Controller method for rendering data
 public function renderData(Request $request) {
-    return DataTable::make(CADataTable::class)->renderData($request);
+    return DataTable::make(MyDataTableClass::class)->renderData($request);
 }
 ```
 
@@ -123,7 +123,7 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 
 [ico-version]: https://img.shields.io/packagist/v/code4interactive/DataTable.svg?style=flat-square
 [ico-scrutinizer]: https://img.shields.io/scrutinizer/g/code4interactive/DataTable.svg?style=flat-square
-[ico-circle]: https://circleci.com/gh/code4interactive/DataTable/tree/master.svg?style=svg
+[ico-circle]: https://circleci.com/gh/code4interactive/DataTable/tree/L4.svg?style=svg
 [ico-downloads]: https://img.shields.io/packagist/dt/code4interactive/DataTable.svg?style=flat-square
 [link-packagist]: https://packagist.org/packages/code4interactive/DataTable
 
