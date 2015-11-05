@@ -2,7 +2,7 @@
     "name": "code4interactive/DataTable",
     "description": "Simple DataTable helper for Laravel",
     "keywords": ["DataTable", "DataGrid"],
-    "homepage": "https://github.com/Code4/DataTable",
+    "homepage": "https://github.com/code4interactive/DataTable",
     "license": "MIT",
     "authors": [
         {
